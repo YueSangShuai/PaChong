@@ -28,7 +28,7 @@ def pachong(dcity, acity, date):
     response = requests.post(url, headers=headers, data=json.dumps(request_payload))  # 发送post请求
     data = json.loads(response.text)['data']
     datalist = data.get("routeList")  ##得到存放所有航班信息的列表
-    #print(data)
+    print(datalist)
     save_datas=[]
     for num in range(len(datalist)):  ##遍历所有航班
         save_data=[]
@@ -43,6 +43,13 @@ def pachong(dcity, acity, date):
         arrivaldate = flight.get("arrivalDate")  ##到达时间
         departure=flight.get("arrivalAirportInfo").get("airportName")##到达机场
 
+        price=datalist[num].get("legs")[0].get("characteristic")
+
+        adultprice=price.get("lowestPrice") ##成人票
+        adultcfprice=price.get('lowestCfPrice')#成人头等舱
+        childprice=price.get('lowestChildPrice')#儿童票
+        childcfprice=price.get('lowestChildCfPrice')
+
         save_data.append(airlineNames)
         save_data.append(flight_no)
         save_data.append(plane_type)
@@ -50,7 +57,13 @@ def pachong(dcity, acity, date):
         save_data.append(arrivalName)
         save_data.append(arrivaldate)
         save_data.append(departure)
+        save_data.append(adultprice)
+        save_data.append(adultcfprice)
+        save_data.append(childprice)
+        save_data.append(childcfprice)
+
         save_datas.append(save_data)
+
     return save_datas
 
 if __name__ == '__main__':
