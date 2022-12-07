@@ -28,7 +28,7 @@ def pachong(dcity, acity, date):
     response = requests.post(url, headers=headers, data=json.dumps(request_payload))  # 发送post请求
     data = json.loads(response.text)['data']
     datalist = data.get("routeList")  ##得到存放所有航班信息的列表
-    print(datalist)
+
     save_datas=[]
     for num in range(len(datalist)):  ##遍历所有航班
         save_data=[]
