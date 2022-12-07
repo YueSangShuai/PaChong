@@ -63,4 +63,4 @@ def getRescult(url1, maxsize):
 
 
 if __name__ == '__main__':
-    getRescult('https://ac.qq.com/Comic/comicInfo/id/531475', 0)
+    getRescult('https://ac.qq.com/Comic/comicInfo/id/649980', 10)
