@@ -79,46 +79,45 @@ def get_chapter_detail(chapter_url: str) -> Dict[str, str]:
 
 
 def getRescult(book_url, max_chapter_count):
-    file_name="./XiaoShuo/"
-    name, autor=get_name_id(book_url)
+    file_name = "./XiaoShuo/"
+    name, autor = get_name_id(book_url)
+
     # 获取章节列表
     chapter_url_list = get_chapter_url_list(book_url)
-    chapter_url_list = chapter_url_list[:max_chapter_count]
+    if max_chapter_count!=0:
+        chapter_url_list = chapter_url_list[:max_chapter_count]
+
     # 存储路径
-    with open(file_name+name+".txt", 'w', encoding='utf-8') as f:
+    with open(os.path.join(file_name,name) + ".txt", 'w', encoding='utf-8') as f:
         for index in tqdm(range(len(chapter_url_list)), desc=name + '爬取进度'):
             item = get_chapter_detail(chapter_url_list[index])
             f.write('标题: ' + item['title'] + '\n')
             f.write('原文链接: ' + item['url'] + '\n')
             f.write('正文内容: ' + item['content'] + '\n')
 
-
-    novel_path=os.getcwd()+"/XiaoShuo/"
-    novel_name=name+".txt"
-    contents = open(novel_path+novel_name, "r").read()
+    novel_path = os.path.join(os.getcwd(),"XiaoShuo")
+    novel_name = name + ".txt"
+    contents = open(os.path.join(novel_path,novel_name), "r").read()
     mylen = len(contents)
-    zhanyongsize=os.path.getsize(novel_path+novel_name)
-    return [name, autor,mylen,novel_path,novel_name,zhanyongsize]
+    zhanyongsize = os.path.getsize(os.path.join(novel_path,novel_name))
+    return [name, autor, mylen, novel_path, novel_name, zhanyongsize]
+
 
 def get_name_id(book_url):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.96 Safari/537.36 Edg/88.0.705.50',
     }
     base_url = 'http://www.xbiquge.la'
-    resp = requests.get(book_url, headers=headers)
 
-    href_regex = "<meta>"
     response = requests.get(book_url, headers=headers)
     response.encoding = 'utf-8'
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    name=soup.find(attrs={"property": "og:novel:book_name"})['content']
+    name = soup.find(attrs={"property": "og:novel:book_name"})['content']
     autor = soup.find(attrs={"property": "og:novel:author"})['content']
 
-    return name,autor
-
-
+    return name, autor
 
 
 if __name__ == '__main__':

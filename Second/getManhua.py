@@ -1,9 +1,22 @@
 import os
 import time
 import requests
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from lxml import etree
 from tqdm import tqdm, trange
+
+
+def getautor(url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.139 Safari/537.36"
+    }
+    part_url = "http://ac.qq.com"
+    res = requests.get(url, headers=headers)
+    soup = BeautifulSoup(res.text, 'html.parser')
+    autor = soup.find('a', class_='works-author-name')['title']
+
+    return autor
 
 
 def getChapterUrl(url):
@@ -42,6 +55,7 @@ def getChapterFile(url, path1, path2):
     chrome.get(url)
     time.sleep(4)
     imgs = chrome.find_elements_by_xpath("//div[@id='mainView']/ul[@id='comicContain']//img")
+
     data = path2.split('/')
     for i in tqdm(range(len(imgs)), desc=data[2] + '爬取进度'):
         js = "document.getElementById('mainView').scrollTop=" + str((i) * 1280)
@@ -50,6 +64,11 @@ def getChapterFile(url, path1, path2):
             f.write(requests.get(imgs[i].get_attribute("src")).content)
     chrome.close()
 
+    manhuazhagnjiename = data[2]
+    manhualujin = os.getcwd() + path2
+    manhuasize = len(os.listdir(os.getcwd() + "/" + path2 + '/'))
+    return manhuazhagnjiename, manhualujin, manhuasize
+
 
 def getRescult(url1, maxsize):
     temp1, temp2 = getChapterUrl(url1)
@@ -57,10 +76,23 @@ def getRescult(url1, maxsize):
         temp1 = temp1[:maxsize]
         temp2 = temp2[:maxsize]
 
+    saverescults = []
+    autor = getautor(url1)
     for i in range(len(temp1)):
+        rescult = []
         temp = "manhua/" + temp1[i][0] + "/" + temp1[i][1]
-        getChapterFile(temp2[i], "manhua/" + temp1[i][0], temp)
+        name, path, count = getChapterFile(temp2[i], "manhua/" + temp1[i][0], temp)
+        rescult.append(temp1[0][0])
+        rescult.append(autor)
+        rescult.append(name)
+        rescult.append(path)
+        rescult.append(count)
+        saverescults.append(rescult)
+
+    # print(saverescults)
+    return saverescults
 
 
 if __name__ == '__main__':
-    getRescult('https://ac.qq.com/Comic/comicInfo/id/649980', 10)
+    getautor('https://ac.qq.com/Comic/comicInfo/id/649980')
+    # getRescult('https://ac.qq.com/Comic/comicInfo/id/649980', 10)
